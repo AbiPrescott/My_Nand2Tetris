@@ -1,0 +1,113 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+       //Registers here just to change names
+            Mux (a=false, b=instruction[12], sel=instruction[15], out=abit);
+            Mux (a=false, b=instruction[11], sel=instruction[15], out=c1);
+            Mux (a=false, b=instruction[10], sel=instruction[15], out=c2);
+            Mux (a=false, b=instruction[9], sel=instruction[15], out=c3);
+            Mux (a=false, b=instruction[8], sel=instruction[15], out=c4);
+            Mux (a=false, b=instruction[7], sel=instruction[15], out=c5);
+            Mux (a=false, b=instruction[6], sel=instruction[15], out=c6);
+            Mux (a=false, b=instruction[5], sel=instruction[15], out=d1);
+            Mux (a=false, b=instruction[4], sel=instruction[15], out=d2);
+            Mux (a=false, b=instruction[3], sel=instruction[15], out=d3);
+            Mux (a=false, b=instruction[2], sel=instruction[15], out=j1);
+            Mux (a=false, b=instruction[1], sel=instruction[15], out=j2);
+            Mux (a=false, b=instruction[0], sel=instruction[15], out=j3);
+
+
+
+       //Send C field to ALU
+            /*if A instruction, then make zx and nx 1 in order to output D. OR used because only A has to be high*/
+            Or (a=c1, b=notAmsb, out=zxor);
+            Or (a=c2, b=notAmsb, out=nxor);
+
+            ALU(x=Dregout ,y=MuxBout ,zx=zxor ,nx=nxor ,zy=c3 ,ny=c4 ,f=c5 ,no=c6 ,out=outM, out=ALUout ,zr=zrout ,ng=ngout);
+           
+       //Logic to Jump or not depending on ZR and NG (from ALU)
+    
+            /*sends 1 down line depending on ZR and NG (from ALU)*/
+            DMux4Way (in=true, sel[0]=ngout, sel[1]=zrout, a=positive, b=negative, c=zero, d=zrng);
+
+            /*sends 1 down line depending on J field of instruction*/
+            DMux8Way (in=true, sel[0]=j3, sel[1]=j2, sel[2]=j1, a=null, b=jgt, c=jeq, d=jge, e=jlt, f=jne, g=jle, h=jmp);
+        
+            /*null*/
+            And (a=zrng, b=null, out=outnull); 
+           
+            /*jgt, jge, jne*/ 
+            Or8Way (in[0]=jgt, in[1]=jge, in[2]=jne, out=outposor);
+            And (a=positive, b=outposor, out=outposand);
+            
+            /*jlt, jle, jne*/
+            Or8Way (in[0]=jlt, in[1]=jle, in[2]=jne, out=outnegor);
+            And (a=negative, b=outnegor, out=outnegand);
+           
+            /*jeq*/
+            Or8Way (in[0]=jge, in[1]=jle, in[2]=jeq, out=outmid);
+            And (a=zero, b=outmid, out=outzeroand);
+            
+            /*need to invert if no conditions are met because incrementing needs 1*/
+            Nand (a=outposand, b=outnegand, out=nand1);
+            Nand (a=nand1, b=outzeroand, out=nand2);
+
+            /*if no jump, it is an A instruction, or if no conditions are met, then increment*/
+            Or8Way (in[0]=outnull, in[1]=notAmsb, in[2]=nand2, out=nullormsb);
+            /*if any of jump conditions are met, then load PC*/
+            Or8Way (in[0]=outposand, in[1]=outnegand, in[2]=outzeroand, in[3]=jmp, out=loadpc);
+
+            PC (in=Aregout, load=loadpc , inc=nullormsb, reset=reset , out[0..14]=pc);
+
+        //Sending control from instruction to rest of CPU
+       
+            /*inverted for MuxA because Amsb==0*/
+            Not (in=instruction[15], out=notAmsb);
+
+            /*MuxA: to select between ALU out or A instruction*/
+            Mux16 (a=ALUout, b=instruction, sel=notAmsb, out=MuxAout);
+
+            /*MuxB: to select between A Reg or inM*/  
+            Mux16 (a=Aregout, b=inM, sel=abit, out=MuxBout);
+
+            Or (a=notAmsb, b=d1, out=loadAreg);
+            ARegister (in=MuxAout, load=loadAreg, out=Aregout, out[0..14]=addressM);
+
+            DRegister (in=ALUout, load=d2, out=Dregout);
+
+            /*have to double invert because cannot attach d1 directly to writeM*/
+            Not (in=d3, out=notd3);
+            Not (in=notd3, out=writeM);
+
+        }

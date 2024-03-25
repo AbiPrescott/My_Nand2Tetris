@@ -1,0 +1,8 @@
+CHIP not {
+    IN zx, x[16];
+    OUT out[16];
+PARTS:
+    Not16 (in=x, out=notx);
+    And16 (a=x, b=notx, out=zeroed);
+    Mux16 (a=x, b=zeroed, sel=zx, out=out);
+    }

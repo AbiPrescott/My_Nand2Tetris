@@ -1,0 +1,66 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/3/a/Register.hdl
+/**
+ * 16-bit register:
+ * If load is asserted, the register's value is set to in;
+ * Otherwise, the register maintains its current value:
+ * if (load(t)) out(t+1) = int(t), else out(t+1) = out(t)
+ */
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+    Mux (a=fromout0, b=in[0], sel=load, out=val0);
+    Bit (in=val0, load=load, out=out[0], out=fromout0);
+
+    Mux (a=fromout1, b=in[1], sel=load, out=val1);
+    Bit (in=val1, load=load, out=out[1], out=fromout1);
+
+    Mux (a=fromout2, b=in[2], sel=load, out=val2);
+    Bit (in=val2, load=load, out=out[2], out=fromout2);
+
+    Mux (a=fromout3, b=in[3], sel=load, out=val3);
+    Bit (in=val3, load=load, out=out[3], out=fromout3);
+
+    Mux (a=fromout4, b=in[4], sel=load, out=val4);
+    Bit (in=val4, load=load, out=out[4], out=fromout4);
+
+    Mux (a=fromout5, b=in[5], sel=load, out=val5);
+    Bit (in=val5, load=load, out=out[5], out=fromout5);
+
+    Mux (a=fromout6, b=in[6], sel=load, out=val6);
+    Bit (in=val6, load=load, out=out[6], out=fromout6);
+
+    Mux (a=fromout7, b=in[7], sel=load, out=val7);
+    Bit (in=val7, load=load, out=out[7], out=fromout7);
+
+    Mux (a=fromout8, b=in[8], sel=load, out=val8);
+    Bit (in=val8, load=load, out=out[8], out=fromout8);
+
+    Mux (a=fromout9, b=in[9], sel=load, out=val9);
+    Bit (in=val9, load=load, out=out[9], out=fromout9);
+
+    Mux (a=fromout10, b=in[10], sel=load, out=val10);
+    Bit (in=val10, load=load, out=out[10], out=fromout10);
+
+    Mux (a=fromout11, b=in[11], sel=load, out=val11);
+    Bit (in=val11, load=load, out=out[11], out=fromout11);
+
+    Mux (a=fromout12, b=in[12], sel=load, out=val12);
+    Bit (in=val12, load=load, out=out[12], out=fromout12);
+
+    Mux (a=fromout13, b=in[13], sel=load, out=val13);
+    Bit (in=val13, load=load, out=out[13], out=fromout13);
+
+    Mux (a=fromout14, b=in[14], sel=load, out=val14);
+    Bit (in=val14, load=load, out=out[14], out=fromout14);
+
+    Mux (a=fromout15, b=in[15], sel=load, out=val15);
+    Bit (in=val15, load=load, out=out[15], out=fromout15);
+
+
+
+    }
