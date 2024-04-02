@@ -34,13 +34,13 @@ def main(count):
            eq_count = b
            gt_count = c
            lt_count = d
-           print(current_line)
         else: continue
         # parses arguent 2
         if command_type in ['c_pop', 'c_push', 'c_function', 'c_call']:
             arg_2 = arg2(current_line)
             writePushPop(command_type, arg_1, arg_2, asmfile)
         else: continue
+    asmfile.close
 
 
 ####################################### PARSER #################################################

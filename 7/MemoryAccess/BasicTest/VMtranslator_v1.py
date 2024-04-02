@@ -13,20 +13,15 @@ def main(count):
             print(commandtype(current_line))
         else: continue 
         if commandtype(current_line) != 'c_return':
-            print('arg1: ', arg1(commandtype(current_line), current_line))
             writeArithmetic(current_line, asmfile)
             
 
         else: continue
         print('B', commandtype(current_line))
         if commandtype(current_line) in ['c_pop' , 'c_push' , 'c_function' , 'c_call']:
-            print("WHATS UPPPP")
-            print(2, commandtype(current_line))
-            print('arg2: ', arg2(current_line))
             writePushPop(commandtype(current_line),(arg1(commandtype(current_line), current_line)), arg2(current_line), asmfile)
         else: 
             continue
-        print('HELLOOOOOOO')
 
 
 
