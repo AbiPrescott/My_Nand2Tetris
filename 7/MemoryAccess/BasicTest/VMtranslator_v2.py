@@ -16,16 +16,17 @@ def main(count):
     gt_count = 0
     lt_count = 0
     lines, count, file_length, vm_filename = constructorIN(count)
-    asmfile = (constructorOUT(vm_filename))
+    asmfile = constructorOUT(vm_filename)
     while hasmorecommands(count, file_length) == 1:
         lines, count, file_length, vm_filename = constructorIN(count)
         current_line = advance(lines)
-        count += 1 
+        count += 1
 
         # ignores comments and whitespace
-        if current_line != 'comment':
+        if current_line != "comment":
             command_type = commandtype(current_line)
-        else: continue
+        else:
+            continue
 
         # parses argument 1
         if command_type != 'c_return':
