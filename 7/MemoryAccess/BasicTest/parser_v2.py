@@ -160,9 +160,88 @@ def writeArithmetic(current_line, asmfile, eq_count, gt_count, lt_count):
 
 # translates push/pop to ASM
 def writePushPop(commandtype, arg1, arg2, asmfile):
+    lcl = 300
+    arg = 400
+    temp = 5
+    ptr = 3
+    static = 16
+
+    # PUSH TRANSLATIONS
     if commandtype == 'c_push' and arg1 == 'constant':
-        push_constant = ['@', arg2, '\n', 'D=A\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        push_constant = ['@{}\n'.format(arg2), 'D=A\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
         asmfile.writelines(push_constant)
+
+    if commandtype == 'c_push' and arg1 == 'local':
+        dest = lcl + int(arg2)
+        push_local = ['@0{}\n'.format(dest), 'D=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(push_local)
+
+    if commandtype == 'c_push' and arg1 == 'argument':
+        dest = arg + int(arg2)
+        push_argument = ['@0{}\n'.format(dest), 'D=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(push_argument)
+
+    if commandtype == 'c_push' and arg1 == 'this':
+        push_this = ['@{}\n'.format(arg2), 'D=A\n', '@R3\n', 'A=M+D\n', 'AD=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(push_this)
+
+    if commandtype == 'c_push' and arg1 == 'that':
+        #dest = that + int(arg2)
+        push_that = ['@{}\n'.format(arg2), 'D=A\n', '@R4\n', 'A=M+D\n', 'AD=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(push_that)
+
+    if commandtype == 'c_push' and arg1 == 'temp':
+        dest = temp + int(arg2)
+        push_temp = ['@0{}\n'.format(dest), 'D=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(push_temp)
+
+    if commandtype == 'c_push' and arg1 == 'pointer':
+        dest = ptr + int(arg2)
+        push_pointer = ['@0{}\n'.format(dest), 'D=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n'] 
+        asmfile.writelines(push_pointer)
+
+    if commandtype == 'c_push' and arg1 == 'static':
+        dest = static + int(arg2)
+        push_static = ['@0{}\n'.format(dest), 'D=M\n', '@0\n', 'A=M\n', 'M=D\n', '@0\n', 'M=M+1\n'] 
+        asmfile.writelines(push_static)
+
+
+    # POP TRANSLATIONS
+    if commandtype == 'c_pop' and arg1 == 'local':
+        dest = lcl + int(arg2)
+        pop_local = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(dest), 'M=D\n']
+        asmfile.writelines(pop_local)
+
+    if commandtype == 'c_pop' and arg1 == 'argument':
+        dest = arg + int(arg2)
+        pop_argument = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(dest), 'M=D\n']
+        asmfile.writelines(pop_argument)
+
+    if commandtype == 'c_pop' and arg1 == 'this':
+        #dest = this + int(arg2)
+        pop_this = ['@{}\n'.format(arg2), 'D=A\n', '@R3\n', 'AM=M+D\n', '@0\n', 'AM=M-1\n', 'D=M\n', '@R3\n', 'A=M\n', 'M=D\n', '@{}\n'.format(arg2), 'D=A\n', '@R3\n', 'AM=M-D\n']
+        asmfile.writelines(pop_this)
+
+    if commandtype == 'c_pop' and arg1 == 'that':
+        #dest = that + int(arg2)
+        pop_that = ['@{}\n'.format(arg2), 'D=A\n', '@R4\n', 'AM=M+D\n', '@0\n', 'AM=M-1\n', 'D=M\n', '@R4\n', 'A=M\n', 'M=D\n', '@{}\n'.format(arg2), 'D=A\n', '@R4\n', 'AM=M-D\n']
+        asmfile.writelines(pop_that)
+
+    if commandtype == 'c_pop' and arg1 == 'temp':
+        dest = temp + int(arg2)
+        pop_temp = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(dest), 'M=D\n']
+        asmfile.writelines(pop_temp)
+
+    if commandtype == 'c_pop' and arg1 == 'pointer':
+        dest = ptr + int(arg2)
+        pop_pointer = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(dest), 'M=D\n']
+        asmfile.writelines(pop_pointer)
+
+    if commandtype == 'c_pop' and arg1 == 'static':
+        dest = static + int(arg2)
+        pop_static = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(dest), 'M=D\n']
+        asmfile.writelines(pop_static)
+ 
     return asmfile
 
 
