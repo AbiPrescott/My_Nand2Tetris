@@ -20,12 +20,15 @@ import sys
 
 
 def main(count):
+    eq_count = 0
+    gt_count = 0
+    lt_count = 0
     lines, count, file_length, vm_filename = constructorIN(count)
     asmfile = (constructorOUT(vm_filename))
     while hasmorecommands(count, file_length) == 1:
-        count += 1 
         lines, count, file_length, vm_filename = constructorIN(count)
         current_line = advance(lines)
+        count += 1 
 
         # ignores comments and whitespace
         if current_line != 'comment':
@@ -35,9 +38,12 @@ def main(count):
         # parses argument 1
         if command_type != 'c_return':
            arg_1 = arg1(command_type, current_line)
-           writeArithmetic(current_line, asmfile)
+           _, b, c, d = writeArithmetic(current_line, asmfile, eq_count, gt_count, lt_count)
+           eq_count = b
+           gt_count = c
+           lt_count = d
+           print(current_line)
         else: continue
-
         # parses arguent 2
         if command_type in ['c_pop', 'c_push', 'c_function', 'c_call']:
             arg_2 = arg2(current_line)
@@ -61,7 +67,7 @@ def constructorIN(count):
 
 # logic to determine whether all lines were sent or not
 def hasmorecommands(count, file_length):
-    if count < file_length - 1 :
+    if count < file_length:
         return 1
     else: return 0
 
@@ -110,11 +116,47 @@ def constructorOUT(vmfile_name):
     return asmfile
 
 # translates arithmetic to ASM
-def writeArithmetic(current_line, asmfile):
+def writeArithmetic(current_line, asmfile, eq_count, gt_count, lt_count):
     if current_line == ['add']:
-        add_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'M=M+D\n', 'A=A+1\n']
+        add_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'M=M+D\n']
         asmfile.writelines(add_asm)
-    return asmfile
+
+    if current_line == ['sub']:
+        sub_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'M=M-D\n']
+        asmfile.writelines(sub_asm) 
+
+    if current_line == ['neg']:
+        neg_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'M=-M\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(neg_asm)
+
+    if current_line == ['eq']:
+        eq_count = eq_count + 1
+        eq_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'MD=M-D\n', '@TRUEeq{}\n'.format(eq_count), 'D;JEQ\n', '@0\n', 'AM=M-1\n', 'M=0\n', '@ENDeq{}\n'.format(eq_count), '0;JMP\n', '(TRUEeq{})\n'.format(eq_count), '@0\n', 'AM=M-1\n', 'M=-1\n', '(ENDeq{})\n'.format(eq_count), '@0\n', 'M=M+1\n']
+        asmfile.writelines(eq_asm)
+
+    if current_line == ['gt']:
+        gt_count = gt_count + 1
+        gt_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'MD=M-D\n', '@TRUEgt{}\n'.format(gt_count), 'D;JGT\n', '@0\n', 'AM=M-1\n', 'M=0\n', '@ENDgt{}\n'.format(gt_count), '0;JMP\n', '(TRUEgt{})\n'.format(gt_count), '@0\n', 'AM=M-1\n', 'M=-1\n', '(ENDgt{})\n'.format(gt_count), '@0\n', 'M=M+1\n']
+        asmfile.writelines(gt_asm)
+
+    if current_line == ['lt']:
+        lt_count = lt_count + 1
+        lt_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'MD=M-D\n', '@TRUElt{}\n'.format(lt_count), 'D;JLT\n', '@0\n', 'AM=M-1\n', 'M=0\n', '@ENDlt{}\n'.format(lt_count), '0;JMP\n', '(TRUElt{})\n'.format(lt_count), '@0\n', 'AM=M-1\n', 'M=-1\n', '(ENDlt{})\n'.format(lt_count), '@0\n', 'M=M+1\n']
+        asmfile.writelines(lt_asm)    
+
+    if current_line == ['and']:
+        and_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'M=M&D\n']
+        asmfile.writelines(and_asm)
+
+    if current_line == ['or']:
+        or_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'A=A-1\n', 'M=M|D\n']
+        asmfile.writelines(or_asm)
+
+    if current_line == ['not']:
+        not_asm = ['@0\n', 'M=M-1\n', 'A=M\n', 'D=M\n', 'M=!D\n', '@0\n', 'M=M+1\n']
+        asmfile.writelines(not_asm)
+
+    return asmfile, eq_count, gt_count, lt_count
 
 # translates push/pop to ASM
 def writePushPop(commandtype, arg1, arg2, asmfile):
