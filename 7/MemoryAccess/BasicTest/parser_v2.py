@@ -11,14 +11,6 @@ import sys
 # - repeat until EOF
 
 
-
-# NEXT TASK
-# - complete the arithemtic and push/pop module 
-
-
-
-
-
 def main(count):
     eq_count = 0
     gt_count = 0
