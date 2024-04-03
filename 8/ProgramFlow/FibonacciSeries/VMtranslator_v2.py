@@ -24,9 +24,8 @@ def main(count):
 
         # ignores comments and whitespace
         if current_line != "comment":
-            command_type = commandtype(current_line)
+            command_type = commandtype(current_line[0])
         else:
-            print('hello')
             continue
 
 
@@ -44,12 +43,14 @@ def main(count):
             eq_count = b
             gt_count = c
             lt_count = d
-
-            
         else:
             continue
-        
-        if command_type in ["c_pop", "c_push", "c_function", "c_call"]:
+
+
+        if command_type in ["c_label", "c_goto", "c_if"]:
+            writebranch(command_type, arg_1, asmfile)
+
+        elif command_type in ["c_pop", "c_push", "c_function", "c_call"]:
             # parses arguent 2
             arg_2 = arg2(current_line)
 
@@ -100,28 +101,32 @@ def advance(lines):
 # identifies the opcode. Return value determines what
 # arguments are needed and for determining what the translation is
 def commandtype(current_line):
+
+    print(current_line)
     if "push" in current_line:
         return "c_push"
     elif "pop" in current_line:
         return "c_pop"
+
     elif (
-        "add"
-        or "sub"
-        or "neg"
-        or "eq"
-        or "gt"
-        or "lt"
-        or "and"
-        or "or"
+        "add" in current_line
+        or "sub" in current_line
+        or "neg" in current_line
+        or "eq" in current_line
+        or "gt" in current_line
+        or "lt" in current_line
+        or "and" in current_line
+        or "or" in current_line
         or "not" in current_line
-    ):
-        return "c_arithmetic"
+    ): return "c_arithmetic"
+
+
     elif "label" in current_line:
         return "c_label"
+    elif "if" in current_line:
+        return "c_if"
     elif "goto" in current_line:
         return "c_goto"
-    elif "if-goto" in current_line:
-        return "c_if"
     elif "function" in current_line:
         return "c_function"
     elif "return" in current_line:
@@ -454,10 +459,19 @@ def writePushPop(commandtype, arg1, arg2, asmfile):
     return asmfile
 
 
-def writelabel(commandtype, arg1, asmfile):
+def writebranch(commandtype, arg_1, asmfile):
+    print('hello')
     if commandtype == 'c_label':
-        label_asm = '@{}\n'.format(arg1)
+        label_asm = ['({})\n'.format(arg_1)]
         asmfile.writelines(label_asm)
+    elif commandtype == 'c_goto':
+        goto_asm = ['@{}\n'.format(arg_1), '0;JMP\n']
+        asmfile.writelines(goto_asm)
+    elif commandtype == 'c_if':
+        if_asm = ['@0\n', 'AM=M-1\n', 'D=M\n', '@{}\n'.format(arg_1), 'D;JNE\n']
+        asmfile.writelines(if_asm)
+    
+    return asmfile 
     
 
 
