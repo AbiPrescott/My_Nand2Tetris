@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 
 # SEQUENCE:
 # - open file.vm
@@ -44,7 +45,7 @@ def main(count):
             gt_count = c
             lt_count = d
         else:
-            continue
+            writereturn(command_type, asmfile)
 
 
         if command_type in ["c_label", "c_goto", "c_if"]:
@@ -54,9 +55,12 @@ def main(count):
             # parses arguent 2
             arg_2 = arg2(current_line)
 
-            writePushPop(command_type, arg_1, arg_2, asmfile)
-        else:
-            continue
+            if "c_pop" in command_type or "c_push" in command_type:
+                writePushPop(command_type, arg_1, arg_2, asmfile)
+            elif "c_function" in command_type:
+                writefunction(command_type, arg_1, arg_2, asmfile)
+
+        else: continue 
     asmfile.close
 
 
@@ -277,8 +281,6 @@ def writeArithmetic(current_line, asmfile, eq_count, gt_count, lt_count):
 
 # translates push/pop to ASM
 def writePushPop(commandtype, arg1, arg2, asmfile):
-    lcl = 300
-    arg = 400
     temp = 5
     ptr = 3
     static = 16
@@ -297,9 +299,11 @@ def writePushPop(commandtype, arg1, arg2, asmfile):
         asmfile.writelines(push_constant)
 
     if commandtype == "c_push" and arg1 == "local":
-        dest = lcl + int(arg2)
         push_local = [
-            "@0{}\n".format(dest),
+            '@1\n',
+            "D=M\n",
+            '@{}\n'.format(arg2),
+            'A=D+A\n',
             "D=M\n",
             "@0\n",
             "A=M\n",
@@ -310,10 +314,13 @@ def writePushPop(commandtype, arg1, arg2, asmfile):
         asmfile.writelines(push_local)
 
     if commandtype == "c_push" and arg1 == "argument":
-        dest = arg + int(arg2)
+        # dest = arg + int(arg2)
         push_argument = [
-            "@0{}\n".format(dest),
+            '@2\n',
             "D=M\n",
+            '@{}\n'.format(arg2),
+            'A=D+A\n',
+            'D=M\n',
             "@0\n",
             "A=M\n",
             "M=D\n",
@@ -475,7 +482,84 @@ def writebranch(commandtype, arg_1, asmfile):
     
     return asmfile 
     
+def writefunction(command_type, f_name, arg_num, asmfile):
+    print('whatsup')
+    if 'c_function' in command_type:
+        function_asm = ['({})\n'.format(f_name), '@{}\n'.format(arg_num), 'D=A\n', '({}init_0)\n'.format(f_name), '@0\n', 'A=M\n', 'M=0\n', '@0\n', 'M=M+1\n', 'D=D-1\n', '@{}init_0\n'.format(f_name), 'D;JGT\n']
+        return asmfile.writelines(function_asm)
+    else: return 'invalid syntax'
 
+def writereturn(command_type, asmfile):
+    lcl_count = 13
+    retaddr_count = 14
+    if 'c_return' in command_type:
+        return_asm1= np.array([
+            # endframe = lcl
+            '@1\n',
+            'D=M\n',
+            '@R{}\n'.format(lcl_count),
+            'M=D\n',
+
+            # retaddr = *(endframe - 5)
+            '@5\n', 
+            'D=A\n', 
+            '@R{}\n'.format(lcl_count),
+            'A=M-D\n', 
+            'D=M\n', 
+            '@R{}\n'.format(retaddr_count),
+            'M=D\n', 
+
+            # *arg[0] = pop working stack
+            '@0\n',
+            'AM=M-1\n', 
+            'D=M\n', 
+            '@2\n', 
+            'A=M\n', 
+            'M=D\n', 
+            
+            # SP = arg + 1
+            '@2\n', 
+            'D=M+1\n', 
+            '@0\n', 
+            'M=D\n'
+            ])
+
+        # Restore pointers 
+        sub_from_count = 1
+        ptr_count = 4
+        return_asm2 = np.array([])
+
+        while sub_from_count <= 4:
+            new_array = np.array([
+                '@{}\n'.format(sub_from_count), 
+                'D=A\n', 
+                '@R{}\n'.format(lcl_count), 
+                'A=M-D\n',
+                'D=M\n', 
+                '@{}\n'.format(ptr_count), 
+                'M=D\n'
+            ])
+
+            return_asm2 = np.concatenate([return_asm2, new_array])
+
+            sub_from_count += 1
+            ptr_count -= 1
+
+        return_asm3 = np.array([
+            '@R{}\n'.format(lcl_count), 
+            'A=M\n', 
+            '0;JMP\n'
+        ])
+
+        lcl_count += 1
+        retaddr_count += 1
+
+        return_total = np.concatenate([return_asm1, return_asm2, return_asm3])
+
+        #print(return_asm1)
+
+        print(type(return_total))
+    return asmfile.writelines(return_total)
 
 ####################################### EXECUTION ##############################################
 
