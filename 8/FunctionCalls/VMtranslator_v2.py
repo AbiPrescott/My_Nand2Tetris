@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 
@@ -16,11 +17,15 @@ def main(count):
     eq_count = 0
     gt_count = 0
     lt_count = 0
-    lines, count, file_length, vm_filename = constructorIN(count)
-    asmfile = constructorOUT(vm_filename)
+    ret_count = 0
+    full_vmfile, folder = constructorIN()
+    lines, count, file_length = write_newvm(full_vmfile, count)
+    asmfile = constructorOUT(folder)
+    writeinit(asmfile)
     while hasmorecommands(count, file_length) == 1:
-        lines, count, file_length, vm_filename = constructorIN(count)
+        lines, count, file_length = write_newvm(full_vmfile, count)
         current_line = advance(lines)
+        print(current_line)
         count += 1
 
         # ignores comments and whitespace
@@ -59,6 +64,8 @@ def main(count):
                 writePushPop(command_type, arg_1, arg_2, asmfile)
             elif "c_function" in command_type:
                 writefunction(command_type, arg_1, arg_2, asmfile)
+            elif 'c_call' in command_type:
+                _, ret_count = writecall(command_type, arg_1, arg_2, ret_count, asmfile)
 
         else: continue 
     asmfile.close
@@ -69,15 +76,60 @@ def main(count):
 
 # opens input file and transfers lines to 'lines' ready
 # to be parsed.
-def constructorIN(count):
-    vmfile_name = sys.argv[1]
-    vmfile = open(vmfile_name, "r")
-    lines = vmfile.readlines()
-    file_length = len(lines)
 
-    vmfile.close()
+def constructorIN():
+    folder = sys.argv[1]
+    full_vmfilename = 'full_vmfile.vm'
+    full_vmfile = open(full_vmfilename, 'x')
+    executed = []
 
-    return lines[count], count, file_length, vmfile_name
+    files = os.listdir(folder)
+    vmfiles = []
+    
+    # filter in all the .vm files in vmfiles
+    for file in files:
+        if file.endswith('.vm'):
+            vmfiles.append(file)
+
+    if 'Sys.vm' in vmfiles:
+        index = vmfiles.index('Sys.vm')
+        vmfiles[0], vmfiles[index] = vmfiles[index], vmfiles[0]
+        # for file in files:
+        #     if 'Sys.vm' in file: 
+        #         break
+        #     elif file.endswith('.vm'):
+        #         vmfiles.append(file)
+
+    
+    for vmfile in vmfiles:
+        vmdir = (folder + '/' + vmfile)
+        sys_file = open(vmdir, 'r')
+        sys_lines = sys_file.readlines()
+        for line in sys_lines:
+            full_vmfile.writelines(line)
+        executed = vmfile
+
+        if vmfile not in executed:
+            vmdir = (folder + '/' + vmfile)
+            vm_file = open(vmdir, 'r')
+            vm_lines = vm_file.readlines()
+            for line in vm_lines:
+                full_vmfile.writelines(line)
+            executed = executed.append(vmfile)
+        else: continue
+
+    return full_vmfilename, folder
+
+
+
+def write_newvm(full_vmfilename, count):
+    full_vmfile = open(full_vmfilename, 'r')
+    lines = full_vmfile.readlines()
+    file_length = len(lines)    
+
+    full_vmfile.close()
+
+    return lines[count], count, file_length
 
 
 # logic to determine whether all lines were sent or not
@@ -92,6 +144,8 @@ def hasmorecommands(count, file_length):
 # Splits instruction into seperate words
 # and returns 'comment' to identify comments so that thay can be ignored
 # in main()
+
+#### TRY 'if lines.startwith' 
 def advance(lines):
     current_line = lines.split()
     if len(current_line) == 0:
@@ -106,7 +160,6 @@ def advance(lines):
 # arguments are needed and for determining what the translation is
 def commandtype(current_line):
 
-    print(current_line)
     if "push" in current_line:
         return "c_push"
     elif "pop" in current_line:
@@ -178,7 +231,6 @@ def writeArithmetic(current_line, asmfile, eq_count, gt_count, lt_count):
         asmfile.writelines(add_asm)
 
     if "sub" in current_line:
-        print('helloooo')
         sub_asm = ["@0\n", "M=M-1\n", "A=M\n", "D=M\n", "A=A-1\n", "M=M-D\n"]
         asmfile.writelines(sub_asm)
 
@@ -401,13 +453,43 @@ def writePushPop(commandtype, arg1, arg2, asmfile):
 
     # POP TRANSLATIONS
     if commandtype == "c_pop" and arg1 == "local":
-        dest = lcl + int(arg2)
-        pop_local = ["@0\n", "AM=M-1\n", "D=M\n", "@{}\n".format(dest), "M=D\n"]
+        #dest = lcl + int(arg2)
+        pop_local = [
+            "@{}\n".format(arg2),
+            "D=A\n",
+            "@1\n",
+            "AM=M+D\n",
+            "@0\n",
+            "AM=M-1\n",
+            "D=M\n",
+            "@1\n",
+            "A=M\n",
+            "M=D\n",
+            "@{}\n".format(arg2),
+            "D=A\n",
+            "@1\n",
+            "AM=M-D\n",
+            ]
         asmfile.writelines(pop_local)
 
     if commandtype == "c_pop" and arg1 == "argument":
-        dest = arg + int(arg2)
-        pop_argument = ["@0\n", "AM=M-1\n", "D=M\n", "@{}\n".format(dest), "M=D\n"]
+        #dest = arg + int(arg2)
+        pop_argument = [
+            "@{}\n".format(arg2),
+            "D=A\n",
+            "@2\n",
+            "AM=M+D\n",
+            "@0\n",
+            "AM=M-1\n",
+            "D=M\n",
+            "@2\n",
+            "A=M\n",
+            "M=D\n",
+            "@{}\n".format(arg2),
+            "D=A\n",
+            "@2\n",
+            "AM=M-D\n",
+            ]
         asmfile.writelines(pop_argument)
 
     if commandtype == "c_pop" and arg1 == "this":
@@ -483,15 +565,32 @@ def writebranch(commandtype, arg_1, asmfile):
     return asmfile 
     
 def writefunction(command_type, f_name, arg_num, asmfile):
-    print('whatsup')
     if 'c_function' in command_type:
-        function_asm = ['({})\n'.format(f_name), '@{}\n'.format(arg_num), 'D=A\n', '({}init_0)\n'.format(f_name), '@0\n', 'A=M\n', 'M=0\n', '@0\n', 'M=M+1\n', 'D=D-1\n', '@{}init_0\n'.format(f_name), 'D;JGT\n']
+        function_asm = [
+            '({})\n'.format(f_name), 
+            '@{}\n'.format(arg_num), 
+            'D=A\n', 
+            '@END{}\n'.format(f_name),
+            'D;JEQ\n',
+            '({}init_0)\n'.format(f_name), 
+            '@0\n', 
+            'A=M\n', 
+            'M=0\n', 
+            '@0\n', 
+            'M=M+1\n', 
+            'D=D-1\n',
+            '@{}init_0\n'.format(f_name), 
+            'D;JGT\n'
+            '(END{})\n'.format(f_name)
+            ]
         return asmfile.writelines(function_asm)
     else: return 'invalid syntax'
 
 def writereturn(command_type, asmfile):
     lcl_count = 13
     retaddr_count = 14
+    print(lcl_count)
+    print(retaddr_count)
     if 'c_return' in command_type:
         return_asm1= np.array([
             # endframe = lcl
@@ -502,12 +601,12 @@ def writereturn(command_type, asmfile):
 
             # retaddr = *(endframe - 5)
             '@5\n', 
-            'D=A\n', 
+            'D=A\n',
             '@R{}\n'.format(lcl_count),
             'A=M-D\n', 
             'D=M\n', 
             '@R{}\n'.format(retaddr_count),
-            'M=D\n', 
+            'M=D\n',
 
             # *arg[0] = pop working stack
             '@0\n',
@@ -546,21 +645,142 @@ def writereturn(command_type, asmfile):
             ptr_count -= 1
 
         return_asm3 = np.array([
-            '@R{}\n'.format(lcl_count), 
+            '@R{}\n'.format(retaddr_count), 
             'A=M\n', 
             '0;JMP\n'
         ])
 
-        lcl_count += 1
-        retaddr_count += 1
+        # lcl_count += 1
+        # retaddr_count += 1
 
-        return_total = np.concatenate([return_asm1, return_asm2, return_asm3])
+        comment = np.array(['//return//\n'])
 
-        #print(return_asm1)
+        return_total = np.concatenate([comment, return_asm1, return_asm2, return_asm3])
 
-        print(type(return_total))
     return asmfile.writelines(return_total)
 
+def writecall(command_type, f, n, ret_count, asmfile):
+    if command_type == "c_call":
+
+        call1 = np.array([
+            # push return-address
+            '@ret{}{}\n'.format(f, ret_count), 
+            'D=A\n',
+            '@0\n', 
+            'A=M\n', 
+            'M=D\n', 
+            '@0\n', 
+            'M=M+1\n'
+        ])
+
+        ptr_count = 1
+        while ptr_count <= 4:
+            push_ptr = np.array([
+                '@{}\n'.format(ptr_count),
+                'D=M\n', 
+                '@0\n', 
+                'A=M\n', 
+                'M=D\n',
+                '@0\n',
+                'M=M+1\n'
+            ])
+
+            call1 = np.concatenate([call1, push_ptr])
+            ptr_count += 1
+
+        call2 = np.array([
+            # ARG = SP - n - 5
+            '@0\n', 
+            'D=M\n', 
+            '@{}\n'.format(n), 
+            'D=D-A\n', 
+            '@5\n', 
+            'D=D-A\n', 
+            '@2\n', 
+            'M=D\n',
+
+            # LCL = SP
+            '@0\n', 
+            'D=M\n', 
+            '@1\n', 
+            'M=D\n',
+
+            # goto f 
+            '@{}\n'.format(f),
+            '0;JMP\n',
+            
+            # label for return-address
+            '(ret{}{})\n'.format(f, ret_count)
+        ])
+
+        call_total = np.concatenate([call1, call2])
+        ret_count += 1
+        return asmfile.writelines(call_total), ret_count
+
+def writeinit(asmfile):
+    bootstrap = [
+        # SP = 256
+        '@256\n', 
+        'D=A\n', 
+        '@0\n', 
+        'M=D\n',
+    ]
+
+    # call Sys.init
+    call1 = np.array([
+            # push return-address
+            '@retSys.init\n', 
+            'D=A\n',
+            '@0\n', 
+            'A=M\n', 
+            'M=D\n', 
+            '@0\n', 
+            'M=M+1\n'
+        ])
+
+    ptr_count = 1
+    while ptr_count <= 4:
+        push_ptr = np.array([
+            '@{}\n'.format(ptr_count),
+            'D=M\n', 
+            '@0\n', 
+            'A=M\n', 
+            'M=D\n',
+            '@0\n', 
+            'M=M+1\n'
+            ])
+
+        call1 = np.concatenate([call1, push_ptr])
+        ptr_count += 1
+
+    call2 = np.array([
+            # ARG = SP - n - 5
+                # '@0\n', 
+                # 'D=M\n', 
+                # '@0\n', 
+                # 'D=D+A\n', 
+                # '@5\n', 
+                # 'D=D-A\n', 
+                # '@2\n', 
+                # 'M=D\n',
+
+            # LCL = SP
+                # '@0\n', 
+                # 'D=M\n', 
+                # '@1\n', 
+                # 'M=D\n',
+
+            # goto f 
+                # '@Sys.init\n',
+                # '0;JMP\n',
+            
+            # label for return-address
+            '(retSys.init)\n'
+        ])
+
+    call_total = np.concatenate([bootstrap, call1, call2])
+
+    return asmfile.writelines(call_total)
 ####################################### EXECUTION ##############################################
 
 count = 0
