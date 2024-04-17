@@ -1,0 +1,61 @@
+class Main {
+
+	function void main(){
+
+    // var DisplayStartGame game;
+    // var String start;
+
+	// let game = DisplayStartGame.new();
+    // let start = game.run();
+    // do Output.printString(start);
+
+
+
+////////// Displaying Start and Game  ///////////
+    // var String next_step;
+    // let next_step = String.new(8);
+
+    // let next_step = Display.displayStartGame();
+    // do Output.printString(next_step);
+    
+    // do Sys.wait(10000);
+    // do Screen.clearScreen();
+    
+
+    // let next_step = Display.displayGameOver();
+    // do Output.printString(next_step);
+
+
+/////////// Constructing Square /////////////
+
+    var Square new_square;
+    var Square square2;
+    var Square square3;
+    var int row;
+    var int column;
+
+    let new_square = Square.new(10, 20, 60);
+    do new_square.draw();
+
+    do Output.printInt(new_square.getRow());
+    do Output.printInt(new_square.getColumn());
+
+    let square2 = Square.new(20, 30, 62);
+    do square2.draw();
+
+    do Output.printInt(square2.getRow());
+    do Output.printInt(square2.getColumn());
+
+    do Output.printInt(new_square.getRow());
+    do Output.printInt(new_square.getColumn()); 
+
+    do Output.printInt(Square.getNumOfSquares());
+
+    let square3 = Square.new(40, 50, 60);
+    do Output.printInt(Square.getNumOfSquares());
+ 
+    return;
+
+    }
+}
+

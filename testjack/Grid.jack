@@ -1,0 +1,115 @@
+class Grid {
+    static int row;
+    static int column;
+    static int num_of_cells;
+    static Array pile_cells; // occupied cells by pile
+    static Array block_cells; // occupied cells by falling block
+    static Array occupied_cells; // total occupied cells
+
+    //NOTES: 
+    // - each occupied cell's address is (row number * column number)
+    // - row number increases from left to right
+    // - column number increases from bottom to top
+    // - so cell with highest addrss is at top right of grid
+    
+    // constructor just initialises the attributes
+    constructor Grid new(){
+        let row = 8;
+        let column = 16;
+        let num_of_cells = 128;
+
+        let pile_cells = Array.new(128);
+        let block_cells = Array.new(4);
+        let occupied_cells = Array.new(num_of_cells);
+
+        return this;
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+    
+    // returns array of occupied cells
+    function Array getFilled(){
+        return occupied_cells;
+    }
+
+    // is called whenever movement is made and updates which cells are occupied
+    // by the current falling block depending on movement
+    function void updateBlockOccupied(char movement){
+        var int num_per_block; 
+        var int count;
+
+        let num_per_block = 4;
+        let count = 0;
+
+    /////////////// CHOOSING SCENARIO //////////////////
+        // if block is falling (F) or moved down (D)
+        if ((movement = 70) | (movement = 68)){
+            let column = (column - 1); 
+            } 
+        else{
+            // if block moved left (L)
+            if (movement = 76){
+                let row = (row - 1);
+                } 
+            else{
+                // if block moved right (R)
+                if (movement = 82){
+                    let row = (row + 1);
+                    } 
+                else{
+                    // if block rotated/turned (T)
+                    if (movement = 84){
+                        let
+                    }
+                }
+            }
+
+
+    /////////////////// UPDATING ////////////////////////
+        while (count < num_per_block){
+            let block_cells[count] = (row * column); 
+            let count = count + 1;
+            }
+
+    }
+
+    method void setBlockCells(Array current_block){
+        let block_cells = current_block;
+        return;
+    }
+
+    method void setPileCells(){
+
+    }
+
+
+
+    method boolean askCell(int x, int y) {
+        if (0 <= x <= Row & 0 <= y <= Column){
+
+        }
+        else { 
+            do Output.printString("Invalid Grid Location")
+        }
+    }
+
+    method void clearRow(){
+
+    }  
+
+    method void shiftDown(){
+
+    }
+
+    Block.rotate();
+    Block.moveDown();
+    Block.moveLeft();
+    Block.moveRight();
+    Block.fall();
+
+
+
+}

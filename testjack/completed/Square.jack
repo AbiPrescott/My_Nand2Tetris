@@ -117,6 +117,145 @@ class Square {
     }
 
 
+
+
+
+
+// function void draw(int location) {
+// 	var int memAddress; 
+// 	let memAddress = 16384+location;
+// 	// column 0
+// 	do Memory.poke(memAddress, -1);
+// 	do Memory.poke(memAddress +32, -1);
+// 	do Memory.poke(memAddress +64, -1);
+// 	do Memory.poke(memAddress +96, -1);
+// 	do Memory.poke(memAddress +128, 15);
+// 	do Memory.poke(memAddress +160, 15);
+// 	do Memory.poke(memAddress +192, 15);
+// 	do Memory.poke(memAddress +224, 15);
+// 	do Memory.poke(memAddress +256, 15);
+// 	do Memory.poke(memAddress +288, 15);
+// 	do Memory.poke(memAddress +320, 15);
+// 	do Memory.poke(memAddress +352, 15);
+// 	do Memory.poke(memAddress +384, 15);
+// 	do Memory.poke(memAddress +416, 15);
+// 	do Memory.poke(memAddress +448, 15);
+// 	do Memory.poke(memAddress +480, 15);
+// 	do Memory.poke(memAddress +512, 15);
+// 	do Memory.poke(memAddress +544, 15);
+// 	do Memory.poke(memAddress +576, 15);
+// 	do Memory.poke(memAddress +608, 15);
+// 	do Memory.poke(memAddress +640, -1);
+// 	do Memory.poke(memAddress +672, -1);
+// 	do Memory.poke(memAddress +704, -1);
+// 	do Memory.poke(memAddress +736, -1);
+// 	// column 1
+// 	do Memory.poke(memAddress +1, 255);
+// 	do Memory.poke(memAddress +33, 255);
+// 	do Memory.poke(memAddress +65, 255);
+// 	do Memory.poke(memAddress +97, 255);
+// 	do Memory.poke(memAddress +129, 240);
+// 	do Memory.poke(memAddress +161, 240);
+// 	do Memory.poke(memAddress +193, 240);
+// 	do Memory.poke(memAddress +225, 240);
+// 	do Memory.poke(memAddress +257, 240);
+// 	do Memory.poke(memAddress +289, 240);
+// 	do Memory.poke(memAddress +321, 240);
+// 	do Memory.poke(memAddress +353, 240);
+// 	do Memory.poke(memAddress +385, 240);
+// 	do Memory.poke(memAddress +417, 240);
+// 	do Memory.poke(memAddress +449, 240);
+// 	do Memory.poke(memAddress +481, 240);
+// 	do Memory.poke(memAddress +513, 240);
+// 	do Memory.poke(memAddress +545, 240);
+// 	do Memory.poke(memAddress +577, 240);
+// 	do Memory.poke(memAddress +609, 240);
+// 	do Memory.poke(memAddress +641, 255);
+// 	do Memory.poke(memAddress +673, 255);
+// 	do Memory.poke(memAddress +705, 255);
+// 	do Memory.poke(memAddress +737, 255);
+// 	return;
+// }
+
+// function void drawTest(int location) {
+// 	var int memAddress; 
+// 	let memAddress = 16384+location;
+// 	// column 0
+// 	do Memory.poke(memAddress, -1);
+// 	do Memory.poke(memAddress +32, -1);
+// 	do Memory.poke(memAddress +64, -1);
+// 	do Memory.poke(memAddress +96, -1);
+// 	do Memory.poke(memAddress +128, 15);
+// 	do Memory.poke(memAddress +160, 15);
+// 	do Memory.poke(memAddress +192, 15);
+// 	do Memory.poke(memAddress +224, 15);
+// 	do Memory.poke(memAddress +256, 15);
+// 	do Memory.poke(memAddress +288, 15);
+// 	do Memory.poke(memAddress +320, 15);
+// 	do Memory.poke(memAddress +352, 15);
+// 	do Memory.poke(memAddress +384, 15);
+// 	do Memory.poke(memAddress +416, 15);
+// 	do Memory.poke(memAddress +448, 15);
+// 	do Memory.poke(memAddress +480, 15);
+// 	do Memory.poke(memAddress +512, 15);
+// 	do Memory.poke(memAddress +544, 15);
+// 	do Memory.poke(memAddress +576, 15);
+// 	do Memory.poke(memAddress +608, 15);
+// 	do Memory.poke(memAddress +640, -1);
+// 	do Memory.poke(memAddress +672, -1);
+// 	do Memory.poke(memAddress +704, -1);
+// 	do Memory.poke(memAddress +736, -1);
+// 	// column 1
+// 	do Memory.poke(memAddress +1, -1);
+// 	do Memory.poke(memAddress +33, -1);
+// 	do Memory.poke(memAddress +65, -1);
+// 	do Memory.poke(memAddress +97, -1);
+// 	do Memory.poke(memAddress +129, -16);
+// 	do Memory.poke(memAddress +161, -16);
+// 	do Memory.poke(memAddress +193, -16);
+// 	do Memory.poke(memAddress +225, -16);
+// 	do Memory.poke(memAddress +257, -16);
+// 	do Memory.poke(memAddress +289, -16);
+// 	do Memory.poke(memAddress +321, -16);
+// 	do Memory.poke(memAddress +353, -16);
+// 	do Memory.poke(memAddress +385, -16);
+// 	do Memory.poke(memAddress +417, -16);
+// 	do Memory.poke(memAddress +449, -16);
+// 	do Memory.poke(memAddress +481, -16);
+// 	do Memory.poke(memAddress +513, -16);
+// 	do Memory.poke(memAddress +545, -16);
+// 	do Memory.poke(memAddress +577, -16);
+// 	do Memory.poke(memAddress +609, -16);
+// 	do Memory.poke(memAddress +641, -1);
+// 	do Memory.poke(memAddress +673, -1);
+// 	do Memory.poke(memAddress +705, -1);
+// 	do Memory.poke(memAddress +737, -1);
+// 	return;
+// }
+
+// function void drawSmall(int location) {
+// 	var int memAddress; 
+// 	let memAddress = 16384+location;
+// 	// column 0
+// 	do Memory.poke(memAddress, -1);
+// 	do Memory.poke(memAddress +32, -1);
+// 	do Memory.poke(memAddress +64, -16381);
+// 	do Memory.poke(memAddress +96, -16381);
+// 	do Memory.poke(memAddress +128, -16381);
+// 	do Memory.poke(memAddress +160, -16381);
+// 	do Memory.poke(memAddress +192, -16381);
+// 	do Memory.poke(memAddress +224, -16381);
+// 	do Memory.poke(memAddress +256, -16381);
+// 	do Memory.poke(memAddress +288, -16381);
+// 	do Memory.poke(memAddress +320, -16381);
+// 	do Memory.poke(memAddress +352, -16381);
+// 	do Memory.poke(memAddress +384, -16381);
+// 	do Memory.poke(memAddress +416, -16381);
+// 	do Memory.poke(memAddress +448, -1);
+// 	do Memory.poke(memAddress +480, -1);
+// 	return;
+// }
+
 function void drawBig(int location) {
 	var int memAddress; 
 	let memAddress = 16384+location;

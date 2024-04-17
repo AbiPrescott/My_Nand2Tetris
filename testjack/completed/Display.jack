@@ -1,0 +1,67 @@
+class Display {
+
+    function String displayStartGame(){
+        var String next_step;
+        var char key;
+
+        let next_step = String.new(5);
+
+        do Letter.new(74, 2565); //J
+        do Letter.new(65, 2567); //A
+        do Letter.new(67, 2569); //C
+        do Letter.new(75, 2571); //K
+        do Letter.new(84, 2575); //T
+        do Letter.new(69, 2577); //E
+        do Letter.new(84, 2579); //T
+        do Letter.new(82, 2581); //R
+        do Letter.new(73, 2583); //I
+        do Letter.new(83, 2585); //S
+
+        do Output.moveCursor(15, 23);
+        do Output.printString("press 'p' to play");
+
+        
+        while (~(key = 80)) {
+            let key = Memory.peek(24576); // read value in keyboard
+        }
+
+        let next_step = ("start");
+        return next_step;
+    }
+
+    function String displayGameOver(){
+        var String next_step;
+        var char key;
+
+        let next_step = String.new(8);
+
+        do Letter.new(71, 2565); //G
+        do Letter.new(65, 2567); //A
+        do Letter.new(77, 2569); //M
+        do Letter.new(69, 2571); //E
+        do Letter.new(79, 2575); //O
+        do Letter.new(86, 2577); //V
+        do Letter.new(69, 2579); //E
+        do Letter.new(82, 2581); //R
+ 
+
+        do Output.moveCursor(15, 17);
+        do Output.printString("Play again? Press 'y' for yes and 'n' for no");
+
+        
+        while ((~(key = 89)) & (~(key = 78))) {
+            let key = Memory.peek(24576); // read value in keyboard
+        }
+
+        if (key = 89){ 
+          let next_step = ("restart");  
+        } 
+        else {
+            let next_step = ("end game");
+        }
+        
+        return next_step;
+        
+    }
+
+}
