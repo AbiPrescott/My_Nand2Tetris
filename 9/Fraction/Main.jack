@@ -6,7 +6,11 @@
 // Computes and prints the sum of 2/3 and 1/5.
 class Main {
    function void main() {
-      var Fraction a, b, c;        
+      var Fraction a, b, c;  
+      var Grid grid;
+
+      let grid = Grid.new();    
+      do grid.dispose();  
       let a = Fraction.new(2,3);  
       let b = Fraction.new(1,5);  
       let c = a.plus(b);  // Computes c = a + b

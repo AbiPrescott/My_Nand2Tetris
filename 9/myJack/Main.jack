@@ -1,0 +1,129 @@
+
+class Main {
+
+    function void main(){
+        
+        do initialise();
+        do displayStartGame();
+        do setupGame();
+        do displayGameOver();
+
+        var Grid grid;
+
+        let grid = Grid.new();
+        do grid.dispose();
+        do playGame();
+        return;
+   }
+
+
+
+    function void initialise(){
+
+    }
+
+    function void displayStartGame(){
+        //draw jack tetris here
+
+        do Output.moveCursor(200, 200);
+        do Output.printString("press 'p' to play");
+
+        var char key;
+        var String start;
+        let start = constructor String new(5);
+
+        let key = Keyboard.readChar();
+        if (key = 'p') {
+            let start = "start";
+            return start;
+        } 
+    }
+
+    function void setupGame(){
+        var String task;
+        constructor ScoreBoard new();
+        constructor HighscoreBoard new();
+        constructor Grid new();
+ 
+        if (task = "start"){
+           do ScoreBoard.display();
+           do HighscoreBoard.display();
+
+        } else {
+            if (task = "restart"){
+                do Screen.clearScreen();
+                do initialise();
+                do HighscoreBoard.save(); 
+                do ScoreBoard.display();
+                do HighscoreBoard.display();
+            }
+        }
+
+    }
+
+    function void displayGameOver(){
+        do Output.printString("Play again? Press 'y' for yes and 'n' for no");
+        do Keyboard.readcha        
+
+        var char key;
+        var String restart;
+        let restart = constructor String new(5);
+
+        let key = Keyboard.readChar();
+        if (key = 'p') {
+            let restart = "restart";
+            return restart;
+
+    }
+
+    function void playGame(){
+        var boolean full_column;
+        var char key;
+        var int left_arrow;
+        var int right_arrow;
+        var int down_arrow;
+        var int row;
+        while (full_column == 0){
+            constructor Block new(block_type);
+            do Block.fall;
+            let key = Keyboard.keyPressed();
+
+            if (key = left_arrow) {
+                do Block.moveLeft;
+            } else {
+                if (key = right_arrow) {
+                    do Block.moveRight;
+                } else {
+                    if (key = "r") {
+                        do Block.rotate;
+                    } else {
+                        if (key = down_arrow) {
+                            do Block.moveDown;
+                        }
+                    }
+                }
+            
+            let row = Grid.row;
+            if (row = row num when it's full){
+                do Grid.clearRow();
+            }
+            
+            let column = Grid.column;
+            if (column = column whe it's full){
+                let full_column = 1;
+            }
+
+        }
+
+        return;
+
+
+    
+        }
+        
+
+    }
+
+
+    } 
+}

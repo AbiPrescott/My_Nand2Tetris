@@ -570,7 +570,7 @@ def write_pushpop(commandtype, arg_1, arg_2, asmfile):
         asmfile.writelines(pop_temp)
 
     elif commandtype == "c_pop" and arg_1 == "pointer":
-        dest = ptr + int(arg2)
+        dest = ptr + int(arg_2)
         pop_pointer = ["@0\n", "AM=M-1\n", "D=M\n", "@{}\n".format(dest), "M=D\n"]
         asmfile.writelines(pop_pointer)
 

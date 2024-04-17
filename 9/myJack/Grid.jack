@@ -1,0 +1,53 @@
+
+class Grid {
+    field int row;
+    field int column;
+    field boolean fill;
+    field int num_squares;
+
+    constructor Grid new(){
+        let Row = 10;
+        let Column = 21;
+        let Cell = 210; 
+
+        do Output.printInt(Row);
+        do Output.printInt(Column);
+
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+    
+    method int getFilled() {
+
+    }
+
+    method boolean askCell(int x, int y) {
+        if (0 <= x <= Row & 0 <= y <= Column){
+
+        }
+        else { 
+            do Output.printString("Invalid Grid Location")
+        }
+    }
+
+    method void clearRow(){
+
+    }  
+
+    method void shiftDown(){
+
+    }
+
+    Block.rotate();
+    Block.moveDown();
+    Block.moveLeft();
+    Block.moveRight();
+    Block.fall();
+
+
+
+}

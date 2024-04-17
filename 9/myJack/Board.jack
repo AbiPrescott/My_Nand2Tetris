@@ -1,0 +1,28 @@
+
+class Board {
+
+    class ScoreBoard{
+
+        constructor ScoreBoard new(){
+
+        }
+
+    }
+
+    class HighscoreBoard{
+        
+        constructor HighscoreBoard new(){
+
+        }
+        
+        method void save(){
+
+        }
+
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+}

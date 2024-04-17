@@ -1,0 +1,32 @@
+class Display {
+
+    function String displayStartGame(){
+        var String start;
+        var char key;
+
+        let start = String.new(5);
+
+        do Letter.new(74, 2565); //J
+        do Letter.new(65, 2567); //A
+        do Letter.new(67, 2569); //C
+        do Letter.new(75, 2571); //K
+        do Letter.new(84, 2575); //T
+        do Letter.new(69, 2577); //E
+        do Letter.new(84, 2579); //T
+        do Letter.new(82, 2581); //R
+        do Letter.new(73, 2583); //I
+        do Letter.new(83, 2585); //S
+
+        do Output.moveCursor(15, 23);
+        do Output.printString("press 'p' to play");
+
+        
+        while (~(key = 80)) {
+            let key = Memory.peek(24576); // read value in keyboard
+        }
+
+        return start;
+    }
+
+
+}

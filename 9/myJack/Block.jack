@@ -1,0 +1,55 @@
+
+class Block {
+
+    field int cell_length;
+    field int orientation;
+    field char block_type;
+
+    constructor new Block(block_type){
+
+    }
+
+    method int fall(){
+        var int fell;
+
+        let fell = 6;
+        return fell;
+    }
+
+    method int rotate(){
+        var int rotated;
+
+        let rotated = 5;
+        return rotated;
+    }
+ 
+    method int moveDown(){
+        var int moved_down;
+
+        let moved_down = 1;
+        return moved_down;
+    }
+
+    method int moveLeft(){
+        var int moved_left;
+
+        let moved_left = 3;
+        return moved_left;
+    }
+
+    method int moveRight(){
+        var int moved_right;
+
+        let moved_right = 4;
+        return moved_right;
+    }
+
+    method int randomise(){
+        
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+}

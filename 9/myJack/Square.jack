@@ -1,0 +1,19 @@
+class Square {
+
+    field int num_squares;
+    field int cell_length;
+    field int line_thickness;
+    field int row;
+    field int column;
+    
+    constructor Square new (){
+
+
+    }
+
+    method void dispose(){
+        do Memory.deAlloc(this);
+        return;
+    }
+
+}
